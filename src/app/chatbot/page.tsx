@@ -75,10 +75,10 @@ export default function DashboardPage() {
     e.preventDefault();
     if (!input.trim()) return;
     const question = input.trim();
-    const userMessage = {
+    const userMessage: Message = {
       role: "user",
       content: question,
-      timestamp: formatDateTime(new Date().toISOString()),
+      timestamp: new Date().toISOString(),
     };
     setMessages((prev) => [...prev, userMessage]); // show user message immediately
     setInput("");
@@ -100,7 +100,7 @@ export default function DashboardPage() {
         throw new Error(data.error || "Failed to fetch answer");
       }
 
-      const botMessage = {
+      const botMessage: Message = {
         role: "assistant",
         content: data.output, // response from Python script
         timestamp: new Date().toISOString(),
@@ -109,7 +109,7 @@ export default function DashboardPage() {
       setMessages((prev) => [...prev, botMessage]);
     } catch (error: any) {
       setIsTyping(false);
-      const errorMessage = {
+      const errorMessage: Message = {
         role: "assistant",
         content: `⚠️ Error: ${error.message}`,
         timestamp: new Date().toISOString(),
@@ -153,7 +153,7 @@ export default function DashboardPage() {
       <div className="flex-1 flex flex-col">
         {/* Header */}
         <div className="px-4 py-3 bg-gray-800 border-b border-gray-700 text-lg font-semibold">
-          RAG AI Assistant
+          NBC Assistant
         </div>
 
         {/* Chat Area */}
@@ -162,7 +162,6 @@ export default function DashboardPage() {
             const currentDate = new Date(msg.timestamp);
             const prevDate =
               idx > 0 ? new Date(messages[idx - 1].timestamp) : null;
-            console.log("Current message:", currentDate);
             const showDateSeparator =
               !prevDate ||
               currentDate.toDateString() !== prevDate.toDateString();
@@ -182,20 +181,27 @@ export default function DashboardPage() {
                     msg.role === "user" ? "items-end" : "items-start"
                   }`}
                 >
-              
-  <div
-    className={`max-w-lg px-4 py-3 rounded-lg text-sm ${
-      msg.role === "user"
-        ? "bg-indigo-600 text-white"
-        : "bg-gray-700 text-gray-100"
-    }`}
-  >
-    {msg.content}
-  </div>
-  
-                  <span className="text-xs text-gray-400 mt-1">
-                    {msg.timestamp ? formatDateTime(msg.timestamp) : ""}
-                  </span>
+                  <div
+                    className={`max-w-lg px-4 py-3 rounded-lg text-sm ${
+                      msg.role === "user"
+                        ? "bg-indigo-600 text-white"
+                        : "bg-gray-700 text-gray-100"
+                    }`}
+                  >
+                    {msg.content}
+                  </div>
+                  {msg.timestamp && !isNaN(new Date(msg.timestamp).getTime()) ? (
+                    <span className="text-xs text-gray-400">
+                      {new Date(msg.timestamp).toLocaleString("en-IN", { 
+                        timeZone: "Asia/Kolkata", 
+                        hour: "2-digit", 
+                        minute: "2-digit", 
+                        hour12: true 
+                      })}
+                    </span>
+                  ) : (
+                    <span className="text-xs text-gray-400">Invalid Date</span>
+                  )}
                 </div>
               </div>
             );
