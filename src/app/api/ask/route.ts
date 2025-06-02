@@ -6,7 +6,6 @@ import { max } from "date-fns";
 export async function POST(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
   const token = authHeader?.replace("Bearer ", "");
-  // const token = "eyJhbGciOiJIUzI1NiIsImtpZCI6Ii8xWTFLWHlGaXVUSUw4NjgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL214a29ycGZqZmRhd2FmaWNhaWdvLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJlNzc3MjVkZi02NDY1LTQzYTAtOTZmMC1iMjVjYTUxNGFhOWIiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ4ODQ5MjIwLCJpYXQiOjE3NDg4NDU2MjAsImVtYWlsIjoieWFzaHIzMDM3QGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWxfdmVyaWZpZWQiOnRydWV9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzQ4Nzk2NTY3fV0sInNlc3Npb25faWQiOiI0YjZjNDFiNC1lZjJkLTQ2MDctODliMy1jYzVjNDc4MTZjNWQiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.RkwVLPuCW31IXOlRVRUvdoF8HPAo0g6Rwb2r-NODhLo"
 
   const { data: { user }, error } = await supabase.auth.getUser(token);
     if (error || !user) {
