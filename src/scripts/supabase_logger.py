@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 import uuid
-from supabase_config import create_supabase_client
+from src.scripts.supabase_config import create_supabase_client
 
 class SupabaseLogger(logging.Handler):
     def __init__(self):
