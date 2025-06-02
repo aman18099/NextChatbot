@@ -1,9 +1,8 @@
-
 import sys
 import os
 import sys
 import logging
-from supabase_logger import SupabaseLogger
+from src.scripts.supabase_logger import SupabaseLogger
 from dotenv import load_dotenv
 from rag_utils import (
     generate_common_file_id,
