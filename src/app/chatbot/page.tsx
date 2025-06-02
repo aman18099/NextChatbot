@@ -18,6 +18,7 @@ export default function DashboardPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [input, setInput] = useState("");
+  const [userId, setUserId] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   const router = useRouter();
@@ -71,57 +72,11 @@ export default function DashboardPage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim()) return;
-    const question = input.trim();
-    const userMessage: Message = {
-      role: "user",
-      content: question,
-      timestamp: new Date().toISOString(),
-    };
-    setMessages((prev) => [...prev, userMessage]); // show user message immediately
-    setInput("");
-    setIsTyping(true);
-    try {
-      const res = await fetch("/api/ask", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${await getToken()}`,
-        },
-        credentials: "include", // include Supabase auth cookies
-        body: JSON.stringify({ question: question }),
-      });
-      console.log("Response from /api/ask:", res);
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to fetch answer");
-      }
-
-      const botMessage: Message = {
-        role: "assistant",
-        content: data.output, // response from Python script
-        timestamp: new Date().toISOString(),
-      };
-      setIsTyping(false);
-      setMessages((prev) => [...prev, botMessage]);
-    } catch (error: any) {
-      setIsTyping(false);
-      const errorMessage: Message = {
-        role: "assistant",
-        content: `⚠️ Error: ${error.message}`,
-        timestamp: new Date().toISOString(),
-      };
-      setMessages((prev) => [...prev, errorMessage]);
-    }
-  };
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/login");
-  };
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUserId(data.user?.id ?? null);
+    });
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -130,6 +85,50 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchQueries();
   }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || !userId) return;
+    const question = input.trim();
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: question, timestamp: new Date().toISOString() },
+    ]);
+    setInput("");
+    setIsTyping(true);
+    try {
+      const res = await fetch("https://nextchatbot-6631.onrender.com/api/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question, user_id: userId }),
+      });
+      const data = await res.json();
+      setIsTyping(false);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: data.output || data.error || "No response",
+          timestamp: new Date().toISOString(),
+        },
+      ]);
+    } catch (error: any) {
+      setIsTyping(false);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: `⚠️ Error: ${error.message}`,
+          timestamp: new Date().toISOString(),
+        },
+      ]);
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
 
   return (
     <div className="flex h-screen text-white bg-gray-900">
@@ -241,6 +240,7 @@ export default function DashboardPage() {
             <button
               type="submit"
               className="bg-indigo-600 hover:bg-indigo-700 px-6 py-2 rounded-r-md text-white"
+              disabled={!input.trim() || !userId}
             >
               Send
             </button>
