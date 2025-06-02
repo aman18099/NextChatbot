@@ -10,7 +10,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 import openai
 import tiktoken
 from dotenv import load_dotenv
-from supabase_config import create_supabase_client
+from src.scripts.supabase_config import create_supabase_client
 
 logging.basicConfig(
     level=logging.INFO,
