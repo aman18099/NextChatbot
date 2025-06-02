@@ -4,7 +4,7 @@ import sys
 import logging
 from src.scripts.supabase_logger import SupabaseLogger
 from dotenv import load_dotenv
-from rag_utils import (
+from src.scripts.rag_utils import (
     generate_common_file_id,
     download_pdfs,
     extract_texts_parallel,
