@@ -18,6 +18,7 @@ from src.scripts.rag_utils import (
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
@@ -33,6 +34,14 @@ logger.setLevel(logging.INFO)
 logger.addHandler(SupabaseLogger())
 console_handler = logging.StreamHandler()
 logger.addHandler(console_handler)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://next-chatbot-74dlr3sj2-aman18099s-projects.vercel.app"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class AskRequest(BaseModel):
     question: str
