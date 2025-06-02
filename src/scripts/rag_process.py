@@ -37,8 +37,8 @@ logger.addHandler(console_handler)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://next-chatbot-74dlr3sj2-aman18099s-projects.vercel.app"],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
