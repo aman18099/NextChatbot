@@ -39,10 +39,7 @@ logger.addHandler(console_handler)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://next-chatbot-744lr3sj2-aman18099s-projects.vercel.app",  # your Vercel frontend
-        "http://localhost:3000",  # for local dev
-    ],
+    allow_origins=[*],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
