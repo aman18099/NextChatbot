@@ -15,12 +15,10 @@ from src.scripts.rag_utils import (
     ask_llm,
     store_query_and_answer
 )
-from fastapi import FastAPI, Request, Depends, HTTPException
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-import jwt
 
 app = FastAPI()
 
@@ -49,25 +47,14 @@ class AskRequest(BaseModel):
     question: str
     user_id: str
 
-security = HTTPBearer()
-SUPABASE_JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET")
-
-def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    token = credentials.credentials
-    try:
-        payload = jwt.decode(token, SUPABASE_JWT_SECRET, algorithms=["HS256"])
-        user_id = payload["sub"]  # 'sub' is the user id in Supabase JWT
-        return user_id
-    except Exception:
-        raise HTTPException(status_code=401, detail="Invalid or expired token")
-
 @app.get("/")
 def root():
     return {"message": "RAG backend is running!"}
 
 @app.post("/api/ask")
-async def ask_endpoint(req: AskRequest, user_id=Depends(get_current_user)):
+async def ask_endpoint(req: AskRequest):
     user_query = req.question
+    user_id = req.user_id
     pdf_dir = "downloaded_pdfs"
     os.makedirs(pdf_dir, exist_ok=True)
     pdf_urls = [BOOK_PDF1, BOOK_PDF2]
